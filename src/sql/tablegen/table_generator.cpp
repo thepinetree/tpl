@@ -123,8 +123,8 @@ void ImportTable(const std::string &table_name, Table *table, const std::string 
   std::vector<std::string> col_names;
   for (const auto &col : cols) col_names.push_back(col.name);
 
-  const auto data_file = data_dir + "/" + table_name + ".csv";
-  auto reader = csv::CSVReader(data_file, csv::CSVFormat{}.delimiter('|').column_names(col_names));
+  const auto data_file = data_dir + "/" + table_name + ".data";
+  auto reader = csv::CSVReader(data_file, csv::CSVFormat{}.delimiter(',').column_names(col_names));
   for (csv::CSVRow &row : reader) {
     if (num_vals == 0) {
       for (const auto &col : table->GetSchema().GetColumns()) {
