@@ -11,6 +11,7 @@
 // For parallel sorting.
 #include "tbb/parallel_for_each.h"
 
+#include "common/settings.h"
 #include "logging/logger.h"
 #include "sql/thread_state_container.h"
 #include "util/stage_timer.h"
@@ -208,7 +209,13 @@ void Sorter::SortParallel(const ThreadStateContainer *thread_state_container,
   util::StageTimer<std::milli> timer;
   timer.EnterStage("Parallel Sort Thread-Local Instances");
 
-  tbb::parallel_for_each(tl_sorters, [](Sorter *sorter) { sorter->Sort(); });
+  uint32_t num_threads =
+      Settings::Instance()->GetInt(Settings::Name::ParallelQueryThreads);
+  tbb::task_arena limited_arena(num_threads);
+
+  limited_arena.execute([&] {
+    tbb::parallel_for_each(tl_sorters, [](Sorter *sorter) { sorter->Sort(); });
+  });
 
   timer.ExitStage();
 
@@ -314,18 +321,20 @@ void Sorter::SortParallel(const ThreadStateContainer *thread_state_container,
     return !cmp_fn_(*l.first, *r.first);
   };
 
-  tbb::parallel_for_each(merge_work, [&heap_cmp](const MergeWork<SeqTypeIter> &work) {
-    std::priority_queue<MergeWorkType::Range, std::vector<MergeWorkType::Range>, decltype(heap_cmp)>
-        heap(heap_cmp, work.input_ranges);
-    SeqTypeIter dest = work.destination;
-    while (!heap.empty()) {
-      auto top = heap.top();
-      heap.pop();
-      *dest++ = *top.first;
-      if (top.first + 1 != top.second) {
-        heap.emplace(top.first + 1, top.second);
+  limited_arena.execute([&] {
+    tbb::parallel_for_each(merge_work, [&heap_cmp](const MergeWork<SeqTypeIter> &work) {
+      std::priority_queue<MergeWorkType::Range, std::vector<MergeWorkType::Range>, decltype(heap_cmp)>
+          heap(heap_cmp, work.input_ranges);
+      SeqTypeIter dest = work.destination;
+      while (!heap.empty()) {
+        auto top = heap.top();
+        heap.pop();
+        *dest++ = *top.first;
+        if (top.first + 1 != top.second) {
+          heap.emplace(top.first + 1, top.second);
+        }
       }
-    }
+    });
   });
 
   timer.ExitStage();

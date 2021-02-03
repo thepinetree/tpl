@@ -1,8 +1,10 @@
-#include "sql/codegen/execution_plan.h"
+#include <iostream>
 
+#include "sql/codegen/execution_plan.h"
 #include "spdlog/fmt/fmt.h"
 
 #include "common/exception.h"
+#include "util/timer.h"
 #include "vm/module.h"
 
 namespace tpl::sql::codegen {
@@ -39,7 +41,14 @@ ExecutionPlan::ExecutionPlan(std::vector<ExecutionStep> &&steps) : steps_(std::m
 
 void ExecutionPlan::Run(byte query_state[], vm::ExecutionMode mode) const {
   for (const auto &step : steps_) {
+    util::Timer<std::micro> timer;
+
+    timer.Start();
     step.Run(query_state, mode);
+    timer.Stop();
+
+    std::cout << "Pipeline '" << step.GetFuncName() << "' took "
+              << timer.GetElapsed() << "ms (id: " << step.GetPipelineId() << ")";
   }
 }
 

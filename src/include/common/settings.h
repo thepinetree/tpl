@@ -74,6 +74,11 @@ namespace tpl {
    * Flag indicating if parallel execution is supported.                                           \
    */                                                                                              \
   CONST(ParallelQueryExecution, bool, true)                                                        \
+                                                                                                   \                                                                                                   \
+  /*                                                                                               \
+   * Number of threads to use for parallel execution.                                              \
+   */                                                                                              \
+  CONST(ParallelQueryThreads, uint32_t, 40)                                                        \
                                                                                                    \
   /*                                                                                               \
    * The degree of oversampling when selecting random samples from an input.                       \

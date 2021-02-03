@@ -672,15 +672,22 @@ void AggregationHashTable::ExecuteParallelPartitionedScan(
   util::Timer<std::milli> timer;
   timer.Start();
 
-  tbb::parallel_for_each(nonempty_parts, [&](const uint32_t part_idx) {
-    // Build a hash table over the given partition
-    auto agg_table_partition = GetOrBuildTableOverPartition(query_state, part_idx);
 
-    // Get a handle to the thread-local state of the executing thread
-    auto thread_state = thread_states->AccessCurrentThreadState();
+  uint32_t num_threads =
+      Settings::Instance()->GetInt(Settings::Name::ParallelQueryThreads);
+  tbb::task_arena limited_arena(num_threads);
 
-    // Scan the partition
-    scan_fn(query_state, thread_state, agg_table_partition);
+  limited_arena.execute([&] {
+    tbb::parallel_for_each(nonempty_parts, [&](const uint32_t part_idx) {
+      // Build a hash table over the given partition
+      auto agg_table_partition = GetOrBuildTableOverPartition(query_state, part_idx);
+
+      // Get a handle to the thread-local state of the executing thread
+      auto thread_state = thread_states->AccessCurrentThreadState();
+
+      // Scan the partition
+      scan_fn(query_state, thread_state, agg_table_partition);
+    });
   });
 
   timer.Stop();

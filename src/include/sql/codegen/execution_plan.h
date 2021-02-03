@@ -47,6 +47,11 @@ class ExecutionStep {
    */
   PipelineId GetPipelineId() const { return pipeline_id_; }
 
+  /**
+ * @return The pipeline ID of this step.
+ */
+  std::string GetFuncName() const { return func_name_; }
+
  private:
   // The ID of the pipeline this step belongs to.
   PipelineId pipeline_id_;

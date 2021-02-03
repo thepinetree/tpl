@@ -200,7 +200,14 @@ bool TableVectorIterator::ParallelScan(const uint16_t table_id, void *const quer
 
   // Execute parallel scan
   tbb::blocked_range<uint32_t> block_range(0, table->GetBlockCount(), min_grain_size);
-  tbb::parallel_for(block_range, ScanTask(table_id, query_state, thread_states, scan_fn));
+
+  uint32_t num_threads =
+      Settings::Instance()->GetInt(Settings::Name::ParallelQueryThreads);
+  tbb::task_arena limited_arena(num_threads);
+
+  limited_arena.execute([&] {
+    tbb::parallel_for(block_range, ScanTask(table_id, query_state, thread_states, scan_fn));
+  });
 
   timer.Stop();
 

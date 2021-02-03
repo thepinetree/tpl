@@ -711,7 +711,14 @@ void JoinHashTable::MergeParallel(const ThreadStateContainer *thread_state_conta
     // TODO(pmenon): Switch to parallel if estimate is wrong.
     std::ranges::for_each(tl_join_tables, [this](auto source) { MergeIncomplete<false>(source); });
   } else {
-    tbb::parallel_for_each(tl_join_tables, [this](auto source) { MergeIncomplete<true>(source); });
+    uint32_t num_threads =
+        Settings::Instance()->GetInt(Settings::Name::ParallelQueryThreads);
+    tbb::task_arena limited_arena(num_threads);
+
+    limited_arena.execute([&] {
+      tbb::parallel_for_each(tl_join_tables,
+                             [this](auto source) { MergeIncomplete<true>(source); });
+    });
   }
 
   timer.Stop();
