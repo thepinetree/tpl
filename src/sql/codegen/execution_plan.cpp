@@ -48,7 +48,7 @@ void ExecutionPlan::Run(byte query_state[], vm::ExecutionMode mode) const {
     timer.Stop();
 
     std::cout << "Pipeline '" << step.GetFuncName() << "' took "
-              << timer.GetElapsed() << "ms (id: " << step.GetPipelineId() << ")" << std::endl;
+              << timer.GetElapsed() << "us (id: " << step.GetPipelineId() << ")" << std::endl;
   }
 }
 
