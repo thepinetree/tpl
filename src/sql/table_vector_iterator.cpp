@@ -7,6 +7,7 @@
 
 #include "tbb/parallel_for.h"
 
+#include "common/settings.h"
 #include "logging/logger.h"
 #include "sql/catalog.h"
 #include "sql/thread_state_container.h"

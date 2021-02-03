@@ -14,6 +14,7 @@
 
 #include "common/cpu_info.h"
 #include "common/exception.h"
+#include "common/settings.h"
 #include "logging/logger.h"
 #include "sql/constant_vector.h"
 #include "sql/generic_value.h"
