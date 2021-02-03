@@ -3233,18 +3233,18 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q4_3)(benchmark::State &state) {
 //
 // ---------------------------------------------------------
 
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q1_1)->Unit(benchmark::kMillisecond);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q1_2)->Unit(benchmark::kMillisecond);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q1_3)->Unit(benchmark::kMillisecond);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q2_1)->Unit(benchmark::kMillisecond);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q2_2)->Unit(benchmark::kMillisecond);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q2_3)->Unit(benchmark::kMillisecond);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q3_1)->Unit(benchmark::kMillisecond);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q3_2)->Unit(benchmark::kMillisecond);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q3_3)->Unit(benchmark::kMillisecond);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q3_4)->Unit(benchmark::kMillisecond);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q4_1)->Unit(benchmark::kMillisecond);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q4_2)->Unit(benchmark::kMillisecond);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q4_3)->Unit(benchmark::kMillisecond);
+BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q1_1)->Unit(benchmark::kMillisecond)->Iterations(5);
+BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q1_2)->Unit(benchmark::kMillisecond)->Iterations(5);
+BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q1_3)->Unit(benchmark::kMillisecond)->Iterations(5);
+BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q2_1)->Unit(benchmark::kMillisecond)->Iterations(5);
+BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q2_2)->Unit(benchmark::kMillisecond)->Iterations(5);
+BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q2_3)->Unit(benchmark::kMillisecond)->Iterations(5);
+BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q3_1)->Unit(benchmark::kMillisecond)->Iterations(5);
+BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q3_2)->Unit(benchmark::kMillisecond)->Iterations(5);
+BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q3_3)->Unit(benchmark::kMillisecond)->Iterations(5);
+BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q4_2)->Unit(benchmark::kMillisecond)->Iterations(5);
+BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q3_4)->Unit(benchmark::kMillisecond)->Iterations(5);
+BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q4_1)->Unit(benchmark::kMillisecond)->Iterations(5);
+BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q4_3)->Unit(benchmark::kMillisecond)->Iterations(5);
 
 }  // namespace tpl::sql::codegen
