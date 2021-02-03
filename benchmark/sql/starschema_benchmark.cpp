@@ -31,7 +31,7 @@ namespace tpl::sql::codegen {
 namespace {
 
 // The execution mode.
-constexpr auto kExecutionMode = vm::ExecutionMode::Interpret;
+constexpr auto kExecutionMode = vm::ExecutionMode::Compiled;
 
 // Change this path to where your SSBM data is.
 constexpr char kSSBMDataDir[] = "/mount/Data/NP-SSB/SF100";
