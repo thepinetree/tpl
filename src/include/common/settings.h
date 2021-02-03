@@ -73,6 +73,11 @@ namespace tpl {
   /*                                                                                               \
    * Flag indicating if parallel execution is supported.                                           \
    */                                                                                              \
+  CONST(PrintPipelines, bool, true)                                                                \
+                                                                                                   \
+  /*                                                                                               \
+   * Flag indicating if parallel execution is supported.                                           \
+   */                                                                                              \
   CONST(ParallelQueryExecution, bool, true)                                                        \
                                                                                                    \
   /*                                                                                               \

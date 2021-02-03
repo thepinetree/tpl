@@ -4,6 +4,7 @@
 #include "spdlog/fmt/fmt.h"
 
 #include "common/exception.h"
+#include "common/settings.h"
 #include "util/timer.h"
 #include "vm/module.h"
 
@@ -41,14 +42,18 @@ ExecutionPlan::ExecutionPlan(std::vector<ExecutionStep> &&steps) : steps_(std::m
 
 void ExecutionPlan::Run(byte query_state[], vm::ExecutionMode mode) const {
   for (const auto &step : steps_) {
-    util::Timer<std::micro> timer;
+    if (Settings::Instance()->GetBool(Settings::Name::PrintPipelines)) {
+      util::Timer<std::micro> timer;
 
-    timer.Start();
-    step.Run(query_state, mode);
-    timer.Stop();
+      timer.Start();
+      step.Run(query_state, mode);
+      timer.Stop();
 
-    std::cout << "Pipeline '" << step.GetFuncName() << "' took "
-              << timer.GetElapsed() << "us (id: " << step.GetPipelineId() << ")" << std::endl;
+      std::cout << "Pipeline '" << step.GetFuncName() << "' took "
+                << timer.GetElapsed() << "us (id: " << step.GetPipelineId() << ")" << std::endl;
+    } else {
+      step.Run(query_state, mode);
+    }
   }
 }
 

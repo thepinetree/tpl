@@ -34,7 +34,7 @@ namespace {
 constexpr auto kExecutionMode = vm::ExecutionMode::Interpret;
 
 // Change this path to where your SSBM data is.
-constexpr char kSSBMDataDir[] = "/mount/Data/NP-SSB/SF1";
+constexpr char kSSBMDataDir[] = "/mount/Data/NP-SSB/SF100";
 
 // Flag used to ensure the SSBM database is only loaded once.
 std::once_flag kLoadSSBMDatabaseOnce{};
