@@ -74,7 +74,7 @@ namespace tpl {
    * Flag indicating if parallel execution is supported.                                           \
    */                                                                                              \
   CONST(ParallelQueryExecution, bool, true)                                                        \
-                                                                                                   \                                                                                                   \
+                                                                                                   \
   /*                                                                                               \
    * Number of threads to use for parallel execution.                                              \
    */                                                                                              \
