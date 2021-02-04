@@ -49,8 +49,8 @@ void ExecutionPlan::Run(byte query_state[], vm::ExecutionMode mode) const {
       step.Run(query_state, mode);
       timer.Stop();
 
-      std::cout << "Pipeline '" << step.GetFuncName() << "' took "
-                << timer.GetElapsed() << "us (id: " << step.GetPipelineId() << ")" << std::endl;
+      auto threads = Settings::Instance()->GetInt(Settings::Name::ParallelQueryThreads);
+      std::cout << threads << ","<< step.GetPipelineId() << "," << timer.GetElapsed() << "us";
     } else {
       step.Run(query_state, mode);
     }

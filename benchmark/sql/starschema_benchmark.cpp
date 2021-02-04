@@ -5,6 +5,7 @@
 
 #include "benchmark/benchmark.h"
 
+#include "common/settings.h"
 #include "compiler/compiler.h"
 #include "sema/sema.h"
 #include "sql/codegen/compilation_context.h"
@@ -43,6 +44,8 @@ std::once_flag kLoadSSBMDatabaseOnce{};
 
 class StarSchemaBenchmark : public benchmark::Fixture {
  public:
+  const std::vector<uint8_t> threads_{1, 2, 4, 8, 16, 32, 40};
+
   void SetUp(benchmark::State &st) override {
     Fixture::SetUp(st);
     std::call_once(kLoadSSBMDatabaseOnce, []() {
@@ -158,19 +161,23 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q1_1)(benchmark::State &state) {
   // Compile plan!
   auto query = CompilationContext::Compile(*agg);
 
-  // Run Once to force compilation
-  NoOpResultConsumer consumer;
-  {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, agg->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
-  }
+  for (uint32_t thread_ct : threads_) {
+    Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
-  // Only time execution.
-  for (auto _ : state) {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, agg->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
+    // Run Once to force compilation
+    NoOpResultConsumer consumer;
+    {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, agg->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
+
+    // Only time execution.
+    for (auto _ : state) {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, agg->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
   }
 }
 
@@ -281,19 +288,23 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q1_2)(benchmark::State &state) {
   // Compile plan!
   auto query = CompilationContext::Compile(*agg);
 
-  // Run Once to force compilation
-  NoOpResultConsumer consumer;
-  {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, agg->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
-  }
+  for (uint32_t thread_ct : threads_) {
+    Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
-  // Only time execution.
-  for (auto _ : state) {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, agg->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
+    // Run Once to force compilation
+    NoOpResultConsumer consumer;
+    {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, agg->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
+
+    // Only time execution.
+    for (auto _ : state) {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, agg->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
   }
 }
 
@@ -407,19 +418,23 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q1_3)(benchmark::State &state) {
   // Compile plan!
   auto query = CompilationContext::Compile(*agg);
 
-  // Run Once to force compilation
-  NoOpResultConsumer consumer;
-  {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, agg->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
-  }
+  for (uint32_t thread_ct : threads_) {
+    Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
-  // Only time execution.
-  for (auto _ : state) {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, agg->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
+    // Run Once to force compilation
+    NoOpResultConsumer consumer;
+    {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, agg->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
+
+    // Only time execution.
+    for (auto _ : state) {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, agg->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
   }
 }
 
@@ -656,21 +671,24 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q2_1)(benchmark::State &state) {
   // Compile plan
   auto query = CompilationContext::Compile(*sort);
 
-  // Consumer.
-  NoOpResultConsumer consumer;
+  for (uint32_t thread_ct : threads_) {
+    Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
-  // Run Once to force compilation
-  {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
-  }
+    // Consumer.
+    NoOpResultConsumer consumer;
+    // Run Once to force compilation
+    {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
 
-  // Only time execution.
-  for (auto _ : state) {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
+    // Only time execution.
+    for (auto _ : state) {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
   }
 }
 
@@ -906,21 +924,24 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q2_2)(benchmark::State &state) {
   // Compile plan
   auto query = CompilationContext::Compile(*sort);
 
-  // Consumer.
-  NoOpResultConsumer consumer;
+  for (uint32_t thread_ct : threads_) {
+    Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
-  // Run Once to force compilation
-  {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
-  }
+    // Consumer.
+    NoOpResultConsumer consumer;
+    // Run Once to force compilation
+    {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
 
-  // Only time execution.
-  for (auto _ : state) {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
+    // Only time execution.
+    for (auto _ : state) {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
   }
 }
 
@@ -1155,21 +1176,25 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q2_3)(benchmark::State &state) {
   // Compile plan
   auto query = CompilationContext::Compile(*sort);
 
-  // Consumer.
-  NoOpResultConsumer consumer;
 
-  // Run Once to force compilation
-  {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
-  }
+  for (uint32_t thread_ct : threads_) {
+    Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
-  // Only time execution.
-  for (auto _ : state) {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
+    // Consumer.
+    NoOpResultConsumer consumer;
+    // Run Once to force compilation
+    {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
+
+    // Only time execution.
+    for (auto _ : state) {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
   }
 }
 
@@ -1420,21 +1445,24 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q3_1)(benchmark::State &state) {
   // Compile plan
   auto query = CompilationContext::Compile(*sort);
 
-  // Consumer.
-  NoOpResultConsumer consumer;
+  for (uint32_t thread_ct : threads_) {
+    Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
-  // Run Once to force compilation
-  {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
-  }
+    // Consumer.
+    NoOpResultConsumer consumer;
+    // Run Once to force compilation
+    {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
 
-  // Only time execution.
-  for (auto _ : state) {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
+    // Only time execution.
+    for (auto _ : state) {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
   }
 }
 
@@ -1685,21 +1713,24 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q3_2)(benchmark::State &state) {
   // Compile plan
   auto query = CompilationContext::Compile(*sort);
 
-  // Consumer.
-  NoOpResultConsumer consumer;
+  for (uint32_t thread_ct : threads_) {
+    Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
-  // Run Once to force compilation
-  {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
-  }
+    // Consumer.
+    NoOpResultConsumer consumer;
+    // Run Once to force compilation
+    {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
 
-  // Only time execution.
-  for (auto _ : state) {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
+    // Only time execution.
+    for (auto _ : state) {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
   }
 }
 
@@ -1952,21 +1983,24 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q3_3)(benchmark::State &state) {
   // Compile plan
   auto query = CompilationContext::Compile(*sort);
 
-  // Consumer.
-  NoOpResultConsumer consumer;
+  for (uint32_t thread_ct : threads_) {
+    Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
-  // Run Once to force compilation
-  {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
-  }
+    // Consumer.
+    NoOpResultConsumer consumer;
+    // Run Once to force compilation
+    {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
 
-  // Only time execution.
-  for (auto _ : state) {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
+    // Only time execution.
+    for (auto _ : state) {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
   }
 }
 
@@ -2220,21 +2254,24 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q3_4)(benchmark::State &state) {
   // Compile plan
   auto query = CompilationContext::Compile(*sort);
 
-  // Consumer.
-  NoOpResultConsumer consumer;
+  for (uint32_t thread_ct : threads_) {
+    Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
-  // Run Once to force compilation
-  {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
-  }
+    // Consumer.
+    NoOpResultConsumer consumer;
+    // Run Once to force compilation
+    {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
 
-  // Only time execution.
-  for (auto _ : state) {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
+    // Only time execution.
+    for (auto _ : state) {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
   }
 }
 
@@ -2537,21 +2574,25 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q4_1)(benchmark::State &state) {
   // Compile plan
   auto query = CompilationContext::Compile(*sort);
 
-  // Consumer.
-  NoOpResultConsumer consumer;
 
-  // Run Once to force compilation
-  {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
-  }
+  for (uint32_t thread_ct : threads_) {
+    Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
-  // Only time execution.
-  for (auto _ : state) {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
+    // Consumer.
+    NoOpResultConsumer consumer;
+    // Run Once to force compilation
+    {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
+
+    // Only time execution.
+    for (auto _ : state) {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
   }
 }
 
@@ -2874,21 +2915,24 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q4_2)(benchmark::State &state) {
   // Compile plan
   auto query = CompilationContext::Compile(*sort);
 
-  // Consumer.
-  NoOpResultConsumer consumer;
+  for (uint32_t thread_ct : threads_) {
+    Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
-  // Run Once to force compilation
-  {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
-  }
+    // Consumer.
+    NoOpResultConsumer consumer;
+    // Run Once to force compilation
+    {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
 
-  // Only time execution.
-  for (auto _ : state) {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
+    // Only time execution.
+    for (auto _ : state) {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
   }
 }
 
@@ -3209,21 +3253,24 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q4_3)(benchmark::State &state) {
   // Compile plan
   auto query = CompilationContext::Compile(*sort);
 
-  // Consumer.
-  NoOpResultConsumer consumer;
+  for (uint32_t thread_ct : threads_) {
+    Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
-  // Run Once to force compilation
-  {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
-  }
+    // Consumer.
+    NoOpResultConsumer consumer;
+    // Run Once to force compilation
+    {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
 
-  // Only time execution.
-  for (auto _ : state) {
-    sql::MemoryPool memory(nullptr);
-    sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
-    query->Run(&exec_ctx, kExecutionMode);
+    // Only time execution.
+    for (auto _ : state) {
+      sql::MemoryPool memory(nullptr);
+      sql::ExecutionContext exec_ctx(&memory, sort->GetOutputSchema(), &consumer);
+      query->Run(&exec_ctx, kExecutionMode);
+    }
   }
 }
 
@@ -3233,18 +3280,18 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q4_3)(benchmark::State &state) {
 //
 // ---------------------------------------------------------
 
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q1_1)->Unit(benchmark::kMillisecond)->Iterations(5);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q1_2)->Unit(benchmark::kMillisecond)->Iterations(5);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q1_3)->Unit(benchmark::kMillisecond)->Iterations(5);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q2_1)->Unit(benchmark::kMillisecond)->Iterations(5);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q2_2)->Unit(benchmark::kMillisecond)->Iterations(5);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q2_3)->Unit(benchmark::kMillisecond)->Iterations(5);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q3_1)->Unit(benchmark::kMillisecond)->Iterations(5);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q3_2)->Unit(benchmark::kMillisecond)->Iterations(5);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q3_3)->Unit(benchmark::kMillisecond)->Iterations(5);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q4_2)->Unit(benchmark::kMillisecond)->Iterations(5);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q3_4)->Unit(benchmark::kMillisecond)->Iterations(5);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q4_1)->Unit(benchmark::kMillisecond)->Iterations(5);
-BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q4_3)->Unit(benchmark::kMillisecond)->Iterations(5);
+//BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q1_1)->Unit(benchmark::kMillisecond)->Iterations(5);
+//BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q1_2)->Unit(benchmark::kMillisecond)->Iterations(5);
+//BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q1_3)->Unit(benchmark::kMillisecond)->Iterations(5);
+BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q2_1)->Unit(benchmark::kMillisecond)->Iterations(35);
+BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q2_2)->Unit(benchmark::kMillisecond)->Iterations(35);
+//BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q2_3)->Unit(benchmark::kMillisecond)->Iterations(5);
+BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q3_1)->Unit(benchmark::kMillisecond)->Iterations(35);
+//BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q3_2)->Unit(benchmark::kMillisecond)->Iterations(5);
+//BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q3_3)->Unit(benchmark::kMillisecond)->Iterations(5);
+//BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q3_4)->Unit(benchmark::kMillisecond)->Iterations(5);
+BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q4_1)->Unit(benchmark::kMillisecond)->Iterations(35);
+BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q4_2)->Unit(benchmark::kMillisecond)->Iterations(35);
+//BENCHMARK_REGISTER_F(StarSchemaBenchmark, Q4_3)->Unit(benchmark::kMillisecond)->Iterations(5);
 
 }  // namespace tpl::sql::codegen
