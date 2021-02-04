@@ -50,7 +50,8 @@ void ExecutionPlan::Run(byte query_state[], vm::ExecutionMode mode) const {
       timer.Stop();
 
       auto threads = Settings::Instance()->GetInt(Settings::Name::ParallelQueryThreads);
-      std::cout << threads << ","<< step.GetPipelineId() << "," << timer.GetElapsed() << "us";
+      std::cout << threads << ","<< step.GetPipelineId() << ","
+                << timer.GetElapsed() << "us" << std::endl;
     } else {
       step.Run(query_state, mode);
     }
