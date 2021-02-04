@@ -44,7 +44,7 @@ std::once_flag kLoadSSBMDatabaseOnce{};
 
 class StarSchemaBenchmark : public benchmark::Fixture {
  public:
-  const std::vector<uint8_t> threads_{1, 2, 4, 8, 16, 32, 40};
+  const std::vector<int64_t> threads_{1, 2, 4, 8, 16, 32, 40};
 
   void SetUp(benchmark::State &st) override {
     Fixture::SetUp(st);
@@ -161,7 +161,7 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q1_1)(benchmark::State &state) {
   // Compile plan!
   auto query = CompilationContext::Compile(*agg);
 
-  for (uint32_t thread_ct : threads_) {
+  for (int64_t thread_ct : threads_) {
     Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
     // Run Once to force compilation
@@ -288,7 +288,7 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q1_2)(benchmark::State &state) {
   // Compile plan!
   auto query = CompilationContext::Compile(*agg);
 
-  for (uint32_t thread_ct : threads_) {
+  for (int64_t thread_ct : threads_) {
     Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
     // Run Once to force compilation
@@ -418,7 +418,7 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q1_3)(benchmark::State &state) {
   // Compile plan!
   auto query = CompilationContext::Compile(*agg);
 
-  for (uint32_t thread_ct : threads_) {
+  for (int64_t thread_ct : threads_) {
     Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
     // Run Once to force compilation
@@ -671,7 +671,7 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q2_1)(benchmark::State &state) {
   // Compile plan
   auto query = CompilationContext::Compile(*sort);
 
-  for (uint32_t thread_ct : threads_) {
+  for (int64_t thread_ct : threads_) {
     Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
     // Consumer.
@@ -924,7 +924,7 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q2_2)(benchmark::State &state) {
   // Compile plan
   auto query = CompilationContext::Compile(*sort);
 
-  for (uint32_t thread_ct : threads_) {
+  for (int64_t thread_ct : threads_) {
     Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
     // Consumer.
@@ -1177,7 +1177,7 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q2_3)(benchmark::State &state) {
   auto query = CompilationContext::Compile(*sort);
 
 
-  for (uint32_t thread_ct : threads_) {
+  for (int64_t thread_ct : threads_) {
     Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
     // Consumer.
@@ -1445,7 +1445,7 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q3_1)(benchmark::State &state) {
   // Compile plan
   auto query = CompilationContext::Compile(*sort);
 
-  for (uint32_t thread_ct : threads_) {
+  for (int64_t thread_ct : threads_) {
     Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
     // Consumer.
@@ -1713,7 +1713,7 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q3_2)(benchmark::State &state) {
   // Compile plan
   auto query = CompilationContext::Compile(*sort);
 
-  for (uint32_t thread_ct : threads_) {
+  for (int64_t thread_ct : threads_) {
     Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
     // Consumer.
@@ -1983,7 +1983,7 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q3_3)(benchmark::State &state) {
   // Compile plan
   auto query = CompilationContext::Compile(*sort);
 
-  for (uint32_t thread_ct : threads_) {
+  for (int64_t thread_ct : threads_) {
     Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
     // Consumer.
@@ -2254,7 +2254,7 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q3_4)(benchmark::State &state) {
   // Compile plan
   auto query = CompilationContext::Compile(*sort);
 
-  for (uint32_t thread_ct : threads_) {
+  for (int64_t thread_ct : threads_) {
     Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
     // Consumer.
@@ -2575,7 +2575,7 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q4_1)(benchmark::State &state) {
   auto query = CompilationContext::Compile(*sort);
 
 
-  for (uint32_t thread_ct : threads_) {
+  for (int64_t thread_ct : threads_) {
     Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
     // Consumer.
@@ -2915,7 +2915,7 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q4_2)(benchmark::State &state) {
   // Compile plan
   auto query = CompilationContext::Compile(*sort);
 
-  for (uint32_t thread_ct : threads_) {
+  for (int64_t thread_ct : threads_) {
     Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
     // Consumer.
@@ -3253,7 +3253,7 @@ BENCHMARK_DEFINE_F(StarSchemaBenchmark, Q4_3)(benchmark::State &state) {
   // Compile plan
   auto query = CompilationContext::Compile(*sort);
 
-  for (uint32_t thread_ct : threads_) {
+  for (int64_t thread_ct : threads_) {
     Settings::Instance()->Set(Settings::Name::ParallelQueryThreads, thread_ct);
 
     // Consumer.
